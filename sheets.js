@@ -10,22 +10,25 @@ async function saveToSheet(data) {
 
   const now = new Date();
 
-  // convert ke WIB
-  const wib = new Date(now.getTime() + (7 * 60 * 60 * 1000));
+  const tanggal = now.toLocaleDateString("id-ID", {
+    timeZone: "Asia/Jakarta",
+  });
 
-  const tanggal = wib.toLocaleDateString("id-ID"); // 21/02/2026
-  const jam = wib.toLocaleTimeString("id-ID");     // 19:03:41
+  // Normalisasi tipe biar sesuai bahasa sheet
+  let tipe = "pengeluaran";
+  if (data.type === "income") tipe = "pemasukan";
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.SPREADSHEET_ID,
-    range: "Sheet1!A:E",
+    range: "Sheet1!A3:E", // mulai dari row 3
     valueInputOption: "USER_ENTERED",
     resource: {
       values: [[
-        tanggal,
-        data.item,
-        data.amount,
-        data.type || "expense",
+        tanggal,          // A
+        data.item,        // B
+        tipe,             // C
+        data.amount,      // D
+        data.category || "other", // E
       ]],
     },
   });

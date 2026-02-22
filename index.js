@@ -35,23 +35,58 @@ async function startBot() {
       if (!update.message?.text) continue;
 
       const chatId = update.message.chat.id;
-      const text = update.message.text;
-      
-      try {
-        const parsed = await parseText(text);
+      const text = update.message.text.trim();
 
-        await saveToSheet(parsed);
+      // 🔥 HANDLE COMMAND (IMPORTANT)
+      if (text.startsWith("/")) {
+        if (text === "/start") {
+          await sendMessage(
+            chatId,
+            "👋 Halo!\nKirim transaksi ya.\nContoh:\n- beli bakso 10k\n- gaji 5jt"
+          );
+        }
+        continue; // jangan lanjut ke AI
+      }
+
+      try {
+        let parsed = await parseText(text);
+
+        // normalize jadi array
+        if (!Array.isArray(parsed)) {
+          parsed = [parsed];
+        }
+
+        let message = "✅ Data tersimpan:\n";
+
+        for (const item of parsed) {
+          // 🔥 VALIDASI biar ga kirim data aneh ke sheet
+          if (!item.item || !item.amount) {
+            console.log("Skip invalid:", item);
+            continue;
+          }
+
+          // default fallback
+          item.type = item.type || "expense";
+          item.category = item.category || "other";
+
+          await saveToSheet(item);
+
+          const tipeText =
+            item.type === "income" ? "pemasukan" : "pengeluaran";
+
+          message += `- ${item.item} | Rp${item.amount} | ${tipeText} | ${item.category}\n`;
+        }
+
+        await sendMessage(chatId, message);
+
+      } catch (err) {
+        console.log("ERROR:", err.response?.data || err.message);
 
         await sendMessage(
           chatId,
-          `✅ ${parsed.item} - Rp${parsed.amount}`
+          "❌ Gagal membaca input\nCoba contoh: beli bakso 10k"
         );
-
-     } catch (err) {
-  console.log("ERROR ASLI:", err.response?.data || err.message);
-
-  await sendMessage(chatId, "❌ format salah");
-}
+      }
     }
   }
 }
