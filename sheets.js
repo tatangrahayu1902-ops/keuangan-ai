@@ -5,6 +5,20 @@ const auth = new google.auth.GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
+
+async function getCellValue(range) {
+  const sheets = google.sheets({ version: "v4", auth });
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.SPREADSHEET_ID,
+    range: `Sheet1!${range}`,
+  });
+
+  return res.data.values?.[0]?.[0] || 0;
+}
+
+module.exports = { saveToSheet, getCellValue };
+
 async function saveToSheet(data) {
   const sheets = google.sheets({ version: "v4", auth });
 
@@ -33,5 +47,6 @@ async function saveToSheet(data) {
     },
   });
 }
+
 
 module.exports = { saveToSheet };
