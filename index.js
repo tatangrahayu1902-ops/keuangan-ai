@@ -1,25 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
-// 🔍 DETEKSI PERTANYAAN KEUANGAN
-const lower = text.toLowerCase();
 
-if (lower.includes("pengeluaran")) {
-  const total = await getCellValue("H9");
-  await sendMessage(chatId, `💸 Total pengeluaran: Rp${total}`);
-  continue;
-}
-
-if (lower.includes("pemasukan")) {
-  const total = await getCellValue("H4");
-  await sendMessage(chatId, `💰 Total pemasukan: Rp${total}`);
-  continue;
-}
-
-if (lower.includes("saldo") || lower.includes("sisa")) {
-  const total = await getCellValue("H14");
-  await sendMessage(chatId, `📊 Sisa saldo: Rp${total}`);
-  continue;
-}
 const { parseText } = require("./gemini");
 const { saveToSheet } = require("./sheets");
 
@@ -213,15 +194,38 @@ async function startBot() {
         }
 
         // ================== TEXT ==================
-        else if (message.text) {
-          console.log("💬 TEXT:", message.text);
+       else if (message.text) {
 
-          let parsed = await parseText(message.text.trim());
+  const text = message.text.trim();
+  const lower = text.toLowerCase();
 
-          if (!Array.isArray(parsed)) parsed = [parsed];
+  // ================== QUERY KEUANGAN ==================
+  if (lower.includes("pengeluaran")) {
+    const total = await getCellValue("H9");
+    await sendMessage(chatId, `💸 Total pengeluaran: Rp${total}`);
+    continue;
+  }
 
-          items = parsed;
-        }
+  if (lower.includes("pemasukan")) {
+    const total = await getCellValue("H4");
+    await sendMessage(chatId, `💰 Total pemasukan: Rp${total}`);
+    continue;
+  }
+
+  if (lower.includes("saldo") || lower.includes("sisa")) {
+    const total = await getCellValue("H14");
+    await sendMessage(chatId, `📊 Sisa saldo: Rp${total}`);
+    continue;
+  }
+
+  console.log("💬 TEXT:", text);
+
+  let parsed = await parseText(text);
+
+  if (!Array.isArray(parsed)) parsed = [parsed];
+
+  items = parsed;
+}
 
         else {
           continue;
@@ -267,4 +271,5 @@ async function startBot() {
 }
 
 startBot();
+
 
