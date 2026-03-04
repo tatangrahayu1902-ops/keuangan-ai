@@ -83,7 +83,15 @@ async function parseImage(imageBuffer) {
               {
                 text: `
 Extract nota jadi JSON.
+Ambil HANYA item barang yang dibeli.
 
+JANGAN ambil:
+- total
+- subtotal
+- tunai / cash
+- kembalian
+- qty / BRS / QTY
+- nomor struk / tanggal / jam
 Boleh lebih dari 1 item.
 
 Format:
