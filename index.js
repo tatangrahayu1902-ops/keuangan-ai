@@ -2,7 +2,7 @@ require("dotenv").config();
 const axios = require("axios");
 
 const { parseText } = require("./gemini");
-const { saveToSheet } = require("./sheets");
+const { saveToSheet, getCellValue } = require("./sheets");
 
 const TOKEN = process.env.BOT_TOKEN;
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
@@ -271,5 +271,6 @@ async function startBot() {
 }
 
 startBot();
+
 
 
