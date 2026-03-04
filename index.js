@@ -1,6 +1,25 @@
 require("dotenv").config();
 const axios = require("axios");
+// 🔍 DETEKSI PERTANYAAN KEUANGAN
+const lower = text.toLowerCase();
 
+if (lower.includes("pengeluaran")) {
+  const total = await getCellValue("H9");
+  await sendMessage(chatId, `💸 Total pengeluaran: Rp${total}`);
+  continue;
+}
+
+if (lower.includes("pemasukan")) {
+  const total = await getCellValue("H4");
+  await sendMessage(chatId, `💰 Total pemasukan: Rp${total}`);
+  continue;
+}
+
+if (lower.includes("saldo") || lower.includes("sisa")) {
+  const total = await getCellValue("H14");
+  await sendMessage(chatId, `📊 Sisa saldo: Rp${total}`);
+  continue;
+}
 const { parseText } = require("./gemini");
 const { saveToSheet } = require("./sheets");
 
@@ -248,3 +267,4 @@ async function startBot() {
 }
 
 startBot();
+
